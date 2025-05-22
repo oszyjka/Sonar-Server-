@@ -1,4 +1,4 @@
-package tests
+package controllers
 
 import (
 	"bytes"
@@ -7,7 +7,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"go-project/controllers"
 	"go-project/database"
 	"go-project/models"
 
@@ -21,9 +20,9 @@ func setupCartRouter() *echo.Echo {
 	e := echo.New()
 	database.ConnectTestDB()
 	database.DB = database.DBTest
-	e.GET(pathCarts, controllers.GetCarts)
-	e.GET("/carts/:id", controllers.GetCart)
-	e.POST(pathCarts, controllers.CreateCart)
+	e.GET(pathCarts, GetCarts)
+	e.GET("/carts/:id", GetCart)
+	e.POST(pathCarts, CreateCart)
 	return e
 }
 
@@ -36,7 +35,7 @@ func TestCreateCart(t *testing.T) {
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-	err := controllers.CreateCart(c)
+	err := CreateCart(c)
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusCreated, rec.Code)
 }
@@ -47,7 +46,7 @@ func TestAllCarts(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, pathCarts, nil)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-	err := controllers.GetCarts(c)
+	err := GetCarts(c)
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, rec.Code)
 }
@@ -61,7 +60,7 @@ func TestGetCart(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	_ = controllers.CreateCart(c)
+	_ = CreateCart(c)
 
 	id := "1"
 	req = httptest.NewRequest(http.MethodGet, "/carts/1", nil)
@@ -69,7 +68,7 @@ func TestGetCart(t *testing.T) {
 	c = e.NewContext(req, rec)
 	c.SetParamNames("id")
 	c.SetParamValues(id)
-	err := controllers.GetCart(c)
+	err := GetCart(c)
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, rec.Code)
 }
@@ -81,7 +80,7 @@ func TestCreateInvalidCart(t *testing.T) {
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-	err := controllers.CreateCart(c)
+	err := CreateCart(c)
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 }
@@ -94,7 +93,7 @@ func TestGetInvalidCartId(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.SetParamNames("id")
 	c.SetParamValues("abc")
-	err := controllers.GetCart(c)
+	err := GetCart(c)
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 }
@@ -107,7 +106,7 @@ func TestGetNonExistingCart(t *testing.T) {
 	c := e.NewContext(req, rec)
 	c.SetParamNames("id")
 	c.SetParamValues("999999")
-	err := controllers.GetCart(c)
+	err := GetCart(c)
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusNotFound, rec.Code)
 }

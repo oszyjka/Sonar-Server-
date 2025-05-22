@@ -1,4 +1,4 @@
-package tests
+package controllers
 
 import (
 	"bytes"
@@ -10,7 +10,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 
-	"go-project/controllers"
 	"go-project/database"
 	"go-project/models"
 )
@@ -24,11 +23,11 @@ func setupTestServer() *echo.Echo {
 	database.ConnectTestDB()
 	database.DB = database.DBTest
 
-	e.GET(pathProducts, controllers.GetProducts)
-	e.GET(pathProductsId, controllers.GetProduct)
-	e.POST(pathProducts, controllers.CreateProduct)
-	e.PUT(pathProductsId, controllers.UpdateProduct)
-	e.DELETE(pathProductsId, controllers.DeleteProduct)
+	e.GET(pathProducts, GetProducts)
+	e.GET(pathProductsId, GetProduct)
+	e.POST(pathProducts, CreateProduct)
+	e.PUT(pathProductsId, UpdateProduct)
+	e.DELETE(pathProductsId, DeleteProduct)
 
 	return e
 }
@@ -43,7 +42,7 @@ func TestCreateProduct(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	if assert.NoError(t, controllers.CreateProduct(c)) {
+	if assert.NoError(t, CreateProduct(c)) {
 		assert.Equal(t, http.StatusCreated, rec.Code)
 	}
 }
@@ -55,7 +54,7 @@ func TestGetAllProducts(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	if assert.NoError(t, controllers.GetProducts(c)) {
+	if assert.NoError(t, GetProducts(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 	}
 }
@@ -69,7 +68,7 @@ func TesGetProduct(t *testing.T) {
 	c.SetParamNames("id")
 	c.SetParamValues("1")
 
-	if assert.NoError(t, controllers.GetProduct(c)) {
+	if assert.NoError(t, GetProduct(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 	}
 }
@@ -88,7 +87,7 @@ func TestUpdateProduct(t *testing.T) {
 
 	_ = json.NewDecoder(rec.Body).Decode(&updated)
 
-	if assert.NoError(t, controllers.UpdateProduct(c)) {
+	if assert.NoError(t, UpdateProduct(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 	}
 }
@@ -102,7 +101,7 @@ func TestDeleteProduct(t *testing.T) {
 	c.SetParamNames("id")
 	c.SetParamValues("1")
 
-	if assert.NoError(t, controllers.DeleteProduct(c)) {
+	if assert.NoError(t, DeleteProduct(c)) {
 		assert.Equal(t, http.StatusNoContent, rec.Code)
 	}
 }
@@ -116,7 +115,7 @@ func TestGetInvalidId(t *testing.T) {
 	c.SetParamNames("id")
 	c.SetParamValues("999")
 
-	_ = controllers.GetProduct(c)
+	_ = GetProduct(c)
 	assert.Equal(t, http.StatusNotFound, rec.Code)
 
 }
@@ -130,7 +129,7 @@ func TestGetInvalidFormat(t *testing.T) {
 	c.SetParamNames("id")
 	c.SetParamValues("abc")
 
-	_ = controllers.GetProduct(c)
+	_ = GetProduct(c)
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 
 }
@@ -143,7 +142,7 @@ func TestCreateInvalidProduct(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	_ = controllers.CreateProduct(c)
+	_ = CreateProduct(c)
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 }
 
@@ -157,7 +156,7 @@ func TestUpdateInvalidProduct(t *testing.T) {
 	c.SetParamNames("id")
 	c.SetParamValues("999")
 
-	_ = controllers.UpdateProduct(c)
+	_ = UpdateProduct(c)
 	assert.Equal(t, http.StatusNotFound, rec.Code)
 }
 
@@ -170,6 +169,6 @@ func TestDeleteNonExistingProduct(t *testing.T) {
 	c.SetParamNames("id")
 	c.SetParamValues("999")
 
-	_ = controllers.DeleteProduct(c)
+	_ = DeleteProduct(c)
 	assert.Equal(t, http.StatusNotFound, rec.Code)
 }

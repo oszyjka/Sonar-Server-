@@ -1,4 +1,4 @@
-package tests
+package controllers
 
 import (
 	"bytes"
@@ -10,7 +10,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 
-	"go-project/controllers"
 	"go-project/database"
 	"go-project/models"
 )
@@ -22,9 +21,9 @@ func setupCategoryTestServer() *echo.Echo {
 	database.ConnectTestDB()
 	database.DB = database.DBTest
 
-	e.GET(pathCategories, controllers.GetCategories)
-	e.GET("/categories/:id", controllers.GetCategory)
-	e.POST(pathCategories, controllers.CreateCategory)
+	e.GET(pathCategories, GetCategories)
+	e.GET("/categories/:id", GetCategory)
+	e.POST(pathCategories, CreateCategory)
 
 	return e
 }
@@ -39,7 +38,7 @@ func TestCreateCategorie(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	if assert.NoError(t, controllers.CreateCategory(c)) {
+	if assert.NoError(t, CreateCategory(c)) {
 		assert.Equal(t, http.StatusCreated, rec.Code)
 	}
 }
@@ -51,7 +50,7 @@ func TestGetAllCategories(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	if assert.NoError(t, controllers.GetCategories(c)) {
+	if assert.NoError(t, GetCategories(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 	}
 }
@@ -65,7 +64,7 @@ func TesGetCategorie(t *testing.T) {
 	c.SetParamNames("id")
 	c.SetParamValues("1")
 
-	if assert.NoError(t, controllers.GetCategory(c)) {
+	if assert.NoError(t, GetCategory(c)) {
 		assert.Equal(t, http.StatusOK, rec.Code)
 	}
 
@@ -80,7 +79,7 @@ func TestGetNonExistingCategory(t *testing.T) {
 	c.SetParamNames("id")
 	c.SetParamValues("999")
 
-	_ = controllers.GetCategory(c)
+	_ = GetCategory(c)
 	assert.Equal(t, http.StatusNotFound, rec.Code)
 
 }
@@ -94,7 +93,7 @@ func TestGetInvalidCategory(t *testing.T) {
 	c.SetParamNames("id")
 	c.SetParamValues("abc")
 
-	_ = controllers.GetCategory(c)
+	_ = GetCategory(c)
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 }
 
@@ -106,6 +105,6 @@ func TestInvalidCreateCategory(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	_ = controllers.CreateCategory(c)
+	_ = CreateCategory(c)
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 }

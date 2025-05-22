@@ -26,6 +26,4 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.projectKey=oszyjka_Sonar-Server-
-            -Dsonar.organization=oszyjka
             -Dsonar.go.coverage.reportPaths=coverage.out

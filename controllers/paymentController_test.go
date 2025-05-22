@@ -1,4 +1,4 @@
-package tests
+package controllers
 
 import (
 	"bytes"
@@ -7,7 +7,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"go-project/controllers"
 	"go-project/database"
 	"go-project/models"
 
@@ -21,7 +20,7 @@ func setupPaymentRouter() *echo.Echo {
 	e := echo.New()
 	database.ConnectTestDB()
 	database.DB = database.DBTest
-	e.POST(pathPayment, controllers.CreatePayment)
+	e.POST(pathPayment, CreatePayment)
 	return e
 }
 
@@ -39,7 +38,7 @@ func TestCreatePayment(t *testing.T) {
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-	err := controllers.CreatePayment(c)
+	err := CreatePayment(c)
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusCreated, rec.Code)
 
@@ -52,7 +51,7 @@ func TestCreateInvalidPayment(t *testing.T) {
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-	err := controllers.CreatePayment(c)
+	err := CreatePayment(c)
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusBadRequest, rec.Code)
 }
