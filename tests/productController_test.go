@@ -15,16 +15,20 @@ import (
 	"go-project/models"
 )
 
+const pathProducts = "/products"
+const pathProductsId = "/products/:id"
+const pathTestId = "/products/1"
+
 func setupTestServer() *echo.Echo {
 	e := echo.New()
 	database.ConnectTestDB()
 	database.DB = database.DBTest
 
-	e.GET("/products", controllers.GetProducts)
-	e.GET("/products/:id", controllers.GetProduct)
-	e.POST("/products", controllers.CreateProduct)
-	e.PUT("/products/:id", controllers.UpdateProduct)
-	e.DELETE("/products/:id", controllers.DeleteProduct)
+	e.GET(pathProducts, controllers.GetProducts)
+	e.GET(pathProductsId, controllers.GetProduct)
+	e.POST(pathProducts, controllers.CreateProduct)
+	e.PUT(pathProductsId, controllers.UpdateProduct)
+	e.DELETE(pathProductsId, controllers.DeleteProduct)
 
 	return e
 }
@@ -34,7 +38,7 @@ func TestCreateProduct(t *testing.T) {
 
 	product := models.Product{Name: "T-Shirt", Price: 75, CategoryId: 1}
 	body, _ := json.Marshal(product)
-	req := httptest.NewRequest(http.MethodPost, "/products", bytes.NewReader(body))
+	req := httptest.NewRequest(http.MethodPost, pathProducts, bytes.NewReader(body))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
@@ -47,7 +51,7 @@ func TestCreateProduct(t *testing.T) {
 func TestGetAllProducts(t *testing.T) {
 	e := setupTestServer()
 
-	req := httptest.NewRequest(http.MethodGet, "/products", nil)
+	req := httptest.NewRequest(http.MethodGet, pathProducts, nil)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
@@ -59,7 +63,7 @@ func TestGetAllProducts(t *testing.T) {
 func TesGetProduct(t *testing.T) {
 	e := setupTestServer()
 
-	req := httptest.NewRequest(http.MethodGet, "/products/1", nil)
+	req := httptest.NewRequest(http.MethodGet, pathTestId, nil)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.SetParamNames("id")
@@ -75,7 +79,7 @@ func TestUpdateProduct(t *testing.T) {
 
 	updated := models.Product{Name: "T-Shirt", Price: 80.5, CategoryId: 1}
 	body, _ := json.Marshal(updated)
-	req := httptest.NewRequest(http.MethodPut, "/products/1", bytes.NewReader(body))
+	req := httptest.NewRequest(http.MethodPut, pathTestId, bytes.NewReader(body))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
@@ -92,7 +96,7 @@ func TestUpdateProduct(t *testing.T) {
 func TestDeleteProduct(t *testing.T) {
 	e := setupTestServer()
 
-	req := httptest.NewRequest(http.MethodDelete, "/products/1", nil)
+	req := httptest.NewRequest(http.MethodDelete, pathTestId, nil)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.SetParamNames("id")
@@ -134,7 +138,7 @@ func TestGetInvalidFormat(t *testing.T) {
 func TestCreateInvalidProduct(t *testing.T) {
 	e := setupTestServer()
 
-	req := httptest.NewRequest(http.MethodPost, "/products", bytes.NewBuffer([]byte(`{invalid}`)))
+	req := httptest.NewRequest(http.MethodPost, pathProducts, bytes.NewBuffer([]byte(`{invalid}`)))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
@@ -146,7 +150,7 @@ func TestCreateInvalidProduct(t *testing.T) {
 func TestUpdateInvalidProduct(t *testing.T) {
 	e := setupTestServer()
 
-	req := httptest.NewRequest(http.MethodPut, "/products/999", bytes.NewBuffer([]byte(`{"name": "A"}`)))
+	req := httptest.NewRequest(http.MethodPut, "/products/9998", bytes.NewBuffer([]byte(`{"name": "A"}`)))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
@@ -160,7 +164,7 @@ func TestUpdateInvalidProduct(t *testing.T) {
 func TestDeleteNonExistingProduct(t *testing.T) {
 	e := setupTestServer()
 
-	req := httptest.NewRequest(http.MethodDelete, "/products/999", nil)
+	req := httptest.NewRequest(http.MethodDelete, "/products/9997", nil)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	c.SetParamNames("id")

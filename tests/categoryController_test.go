@@ -15,14 +15,16 @@ import (
 	"go-project/models"
 )
 
+const pathCategories = "/categories"
+
 func setupCategoryTestServer() *echo.Echo {
 	e := echo.New()
 	database.ConnectTestDB()
 	database.DB = database.DBTest
 
-	e.GET("/categories", controllers.GetCategories)
+	e.GET(pathCategories, controllers.GetCategories)
 	e.GET("/categories/:id", controllers.GetCategory)
-	e.POST("/categories", controllers.CreateCategory)
+	e.POST(pathCategories, controllers.CreateCategory)
 
 	return e
 }
@@ -32,7 +34,7 @@ func TestCreateCategorie(t *testing.T) {
 
 	category := models.Category{Name: "Clothes"}
 	body, _ := json.Marshal(category)
-	req := httptest.NewRequest(http.MethodPost, "/categories", bytes.NewReader(body))
+	req := httptest.NewRequest(http.MethodPost, pathCategories, bytes.NewReader(body))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
@@ -45,7 +47,7 @@ func TestCreateCategorie(t *testing.T) {
 func TestGetAllCategories(t *testing.T) {
 	e := setupCategoryTestServer()
 
-	req := httptest.NewRequest(http.MethodGet, "/categories", nil)
+	req := httptest.NewRequest(http.MethodGet, pathCategories, nil)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
@@ -99,7 +101,7 @@ func TestGetInvalidCategory(t *testing.T) {
 func TestInvalidCreateCategory(t *testing.T) {
 	e := setupCategoryTestServer()
 
-	req := httptest.NewRequest(http.MethodPost, "/categories", bytes.NewBuffer([]byte(`{invalid}`)))
+	req := httptest.NewRequest(http.MethodPost, pathCategories, bytes.NewBuffer([]byte(`{invalid}`)))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)

@@ -15,11 +15,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const pathPayment = "/payments"
+
 func setupPaymentRouter() *echo.Echo {
 	e := echo.New()
 	database.ConnectTestDB()
 	database.DB = database.DBTest
-	e.POST("/payments", controllers.CreatePayment)
+	e.POST(pathPayment, controllers.CreatePayment)
 	return e
 }
 
@@ -33,7 +35,7 @@ func TestCreatePayment(t *testing.T) {
 		Comment: "Payment for bill nr 14567",
 	}
 	jsonPayment, _ := json.Marshal(payment)
-	req := httptest.NewRequest(http.MethodPost, "/payments", bytes.NewBuffer(jsonPayment))
+	req := httptest.NewRequest(http.MethodPost, pathPayment, bytes.NewBuffer(jsonPayment))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
@@ -46,7 +48,7 @@ func TestCreatePayment(t *testing.T) {
 func TestCreateInvalidPayment(t *testing.T) {
 	e := setupPaymentRouter()
 
-	req := httptest.NewRequest(http.MethodPost, "/payments", bytes.NewBufferString("{invalid}"))
+	req := httptest.NewRequest(http.MethodPost, pathPayment, bytes.NewBufferString("{invalid}"))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)

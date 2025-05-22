@@ -15,13 +15,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+const pathCarts = "/carts"
+
 func setupCartRouter() *echo.Echo {
 	e := echo.New()
 	database.ConnectTestDB()
 	database.DB = database.DBTest
-	e.GET("/carts", controllers.GetCarts)
+	e.GET(pathCarts, controllers.GetCarts)
 	e.GET("/carts/:id", controllers.GetCart)
-	e.POST("/carts", controllers.CreateCart)
+	e.POST(pathCarts, controllers.CreateCart)
 	return e
 }
 
@@ -30,7 +32,7 @@ func TestCreateCart(t *testing.T) {
 
 	cart := models.Cart{User: "Ana", Total: 150}
 	jsonCart, _ := json.Marshal(cart)
-	req := httptest.NewRequest(http.MethodPost, "/carts", bytes.NewBuffer(jsonCart))
+	req := httptest.NewRequest(http.MethodPost, pathCarts, bytes.NewBuffer(jsonCart))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
@@ -42,7 +44,7 @@ func TestCreateCart(t *testing.T) {
 func TestAllCarts(t *testing.T) {
 	e := setupCartRouter()
 
-	req := httptest.NewRequest(http.MethodGet, "/carts", nil)
+	req := httptest.NewRequest(http.MethodGet, pathCarts, nil)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	err := controllers.GetCarts(c)
@@ -54,7 +56,7 @@ func TestGetCart(t *testing.T) {
 	e := setupCartRouter()
 	cart := models.Cart{User: "Ana", Total: 150}
 	jsonCart, _ := json.Marshal(cart)
-	req := httptest.NewRequest(http.MethodPost, "/carts", bytes.NewBuffer(jsonCart))
+	req := httptest.NewRequest(http.MethodPost, pathCarts, bytes.NewBuffer(jsonCart))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
@@ -75,7 +77,7 @@ func TestGetCart(t *testing.T) {
 func TestCreateInvalidCart(t *testing.T) {
 	e := setupCartRouter()
 
-	req := httptest.NewRequest(http.MethodPost, "/carts", bytes.NewBufferString("{invalid json}"))
+	req := httptest.NewRequest(http.MethodPost, pathCarts, bytes.NewBufferString("{invalid json}"))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)

@@ -20,11 +20,13 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
+	const pathProductsId = "/products/:id"
+
 	e.GET("/products", controllers.GetProducts)
-	e.GET("/products/:id", controllers.GetProduct)
+	e.GET(pathProductsId, controllers.GetProduct)
 	e.POST("/products", controllers.CreateProduct)
-	e.PUT("/products/:id", controllers.UpdateProduct)
-	e.DELETE("/products/:id", controllers.DeleteProduct)
+	e.PUT(pathProductsId, controllers.UpdateProduct)
+	e.DELETE(pathProductsId, controllers.DeleteProduct)
 
 	e.GET("/carts", controllers.GetCarts)
 	e.GET("/carts/:id", controllers.GetCart)
