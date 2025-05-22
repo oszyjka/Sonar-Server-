@@ -1,0 +1,28 @@
+# Version control
+.git
+.gitignore
+
+# Secrets
+.env
+*.env
+*.key
+*.pem
+
+# Development
+*.md
+*.log
+test/
+tests/
+coverage.out
+
+# Editor junk
+.vscode/
+.idea/
+*.swp
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+#test_database file
+test_database.go
